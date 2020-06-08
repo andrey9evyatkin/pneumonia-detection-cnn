@@ -25,7 +25,7 @@ def show_data(data, amount=5):
         axis.axis('off')
     figure.text(0.125, 0.05, 'Amount of normal cases: ' + str(len(normal_cases)), ha='left', va='bottom', size=15)
     figure.text(0.125, 0.01, 'Amount of pneumonia cases: ' + str(len(pneumonia_cases)), ha='left', va='bottom', size=15)
-    figure.savefig(RESULT_PATH + "train_examples.png")
+    figure.savefig(RESULT_PATH + 'train_examples.png')
 
 
 def show_confusion_matrix(data_labels, predicted_labels):
@@ -33,7 +33,7 @@ def show_confusion_matrix(data_labels, predicted_labels):
     plot_confusion_matrix(matrix, figsize=(12, 8), hide_ticks=True)
     plt.xticks(range(2), ['Normal', 'Pneumonia'], fontsize=16)
     plt.yticks(range(2), ['Normal', 'Pneumonia'], fontsize=16)
-    plt.savefig(RESULT_PATH + "confusion_matrix.png")
+    plt.savefig(RESULT_PATH + 'confusion_matrix.png')
     confusion_matrix(data_labels, predicted_labels)
     print(confusion_matrix)
     report = classification_report(data_labels, predicted_labels, target_names=['Normal', 'Pneumonia'])
@@ -62,7 +62,7 @@ def show_predicted_results(data_set, predicted_labels, amount=5):
         ax.set_aspect('auto')
         ax.axis('off')
         if index % (rows * columns) == 9:
-            f.savefig(RESULT_PATH + '/predicted_results/' + str(results_index) + '.png')
+            f.savefig(RESULT_PATH + 'predicted_results/' + str(results_index) + '.png')
             results_index += 1
 
     figure, axes = plt.subplots(rows, columns, figsize=(36, 12))
@@ -82,7 +82,7 @@ def show_predicted_results(data_set, predicted_labels, amount=5):
                 ha='left', va='bottom', size=15)
     figure.text(0.125, 0.01, 'Amount of incorrectly predicted cases: ' + str(len(incorrectly_predicted_cases)),
                 ha='left', va='bottom', size=15)
-    figure.savefig(RESULT_PATH + "predicted_examples.png")
+    figure.savefig(RESULT_PATH + 'predicted_examples.png')
 
 
 def show_feature_map_results(layers, activations):
@@ -105,7 +105,7 @@ def show_feature_map_results(layers, activations):
             ax.axis('off')
             ax.imshow(activation[0, :, :, index], cmap='viridis')
             if index % columns == 7:
-                f.savefig(RESULT_PATH + '/feature_maps/' + layer + '_' + str(feature_maps_index) + '.png')
+                f.savefig(RESULT_PATH + 'feature_maps/' + layer + '_' + str(feature_maps_index) + '.png')
                 feature_maps_index += 1
             if column < columns:
                 axis = axes[current_row, column]
@@ -133,7 +133,7 @@ def draw_graph(metrics, labels, y_label):
     plt.figure(figsize=(6, 4))
     plt.plot(metrics[0], c='#0c7cba', label=labels[0])
     plt.plot(metrics[1], c='#c9062a', label=labels[1])
-    plt.xticks(range(0, len(metrics[0]), 5))
+    plt.xticks(range(0, len(metrics[0]), 10))
     plt.xlim(0, len(metrics[0]))
     plt.ylabel(y_label)
     plt.xlabel('Epoch')

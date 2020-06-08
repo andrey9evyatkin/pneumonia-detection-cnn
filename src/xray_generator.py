@@ -3,10 +3,10 @@ from keras.preprocessing.image import ImageDataGenerator
 from constants import *
 
 
-def generate_data(data):
+def generate_data(data_type):
     data_generator = ImageDataGenerator(rescale=1./255)
-    path = DATA_PATH + get_data_type_path(data[1])
-    if data[1] == 'train':
+    path = DATA_PATH + get_data_type_path(data_type)
+    if data_type == 'train':
         data_generator = ImageDataGenerator(
             rescale=1/255,
             shear_range=0.2,

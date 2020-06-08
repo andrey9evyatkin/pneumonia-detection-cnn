@@ -12,13 +12,13 @@ def get_dataframe(data_set):
 
 
 def mark_data(data, label):
-    marked_data = []
+    result = []
     labels = []
     for d in data:
         image = normalize_image(d)
-        marked_data.append(image)
+        result.append(image)
         labels.append(label)
-    return marked_data, labels
+    return result, labels
 
 
 def normalize_image(image):
@@ -26,6 +26,7 @@ def normalize_image(image):
     img = cv2.resize(img, (224, 224))
     if img.shape[2] == 1:
         img = np.dstack([img, img, img])
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    img = np.array(img) / 255
+    else:
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    img = img.astype(np.float32) / 255.
     return img
