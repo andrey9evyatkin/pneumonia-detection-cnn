@@ -12,7 +12,7 @@ def load_data():
     return train_data, val_data, test_data
 
 
-def load_weights():
+def load_vgg16_weights():
     return h5py.File('../etc/vgg16_weights_tf_dim_ordering_tf_kernels_notop.h5', 'r')
 
 

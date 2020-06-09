@@ -1,21 +1,53 @@
+from keras.applications.inception_v3 import InceptionV3
+from keras.applications.resnet50 import ResNet50
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras.layers import Conv2D, Dense, Dropout, Flatten, MaxPooling2D, SeparableConv2D
 from keras.layers.normalization import BatchNormalization
 from keras.models import Sequential, Model
-from keras.optimizers import Adam
+from keras.optimizers import Adam, RMSprop
 from sklearn.metrics import precision_score, recall_score, f1_score
 import numpy as np
 import pickle
 
-from constants import EPOCHS, BATCH_SIZE, RESULT_PATH
-from data_loader import load_data, load_weights
+from constants import EPOCHS, BATCH_SIZE
+from data_loader import *
 from data_preprocessing import get_dataframe
 from data_visualization import *
 from xray_generator import generate_data
 
 
 class CNN:
-    def build(self):
+    def build_resnet50(self):
+        resnet50_model = ResNet50(weights='imagenet', include_top=False, input_shape=(224, 224, 3))
+        model = Sequential()
+        model.add(resnet50_model)
+        model.add(Dropout(0.3))
+        model.add(Flatten())
+        model.add(Dropout(0.5))
+        model.add(Dense(1, activation='sigmoid'))
+
+        model.layers[0].trainable = False
+
+        optimizer = Adam(learning_rate=0.0001, decay=1e-5)
+        model.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=['accuracy'])
+        return model
+
+    def build_inceptionV3(self):
+        inceptionv3_model = InceptionV3(weights='imagenet', include_top=False, input_shape=(224, 224, 3))
+        model = Sequential()
+        model.add(inceptionv3_model)
+        model.add(Dropout(0.3))
+        model.add(Flatten())
+        model.add(Dropout(0.5))
+        model.add(Dense(1, activation='sigmoid'))
+
+        model.layers[0].trainable = False
+
+        optimizer = Adam(learning_rate=0.0001, decay=1e-5)
+        model.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=['accuracy'])
+        return model
+
+    def build_custom(self):
         model = Sequential()
         model.add(Conv2D(64, (3, 3), activation='relu', padding='same', name='conv_block1_layer1', input_shape=(224, 224, 3)))
         model.add(Conv2D(64, (3, 3), activation='relu', padding='same', name='conv_block1_layer2'))
@@ -59,7 +91,7 @@ class CNN:
         return model
 
     def initialize_layers(self, model):
-        file_weights = load_weights()
+        file_weights = load_vgg16_weights()
         w_1, b_1 = file_weights['block1_conv1']['block1_conv1_W_1:0'], file_weights['block1_conv1']['block1_conv1_b_1:0']
         w_2, b_2 = file_weights['block1_conv2']['block1_conv2_W_1:0'], file_weights['block1_conv2']['block1_conv2_b_1:0']
         w_4, b_4 = file_weights['block2_conv1']['block2_conv1_W_1:0'], file_weights['block2_conv1']['block2_conv1_b_1:0']
@@ -75,7 +107,7 @@ class CNN:
         validation_steps = val_generator.samples // BATCH_SIZE
         stop = EarlyStopping(patience=5)
         checkpoint = ModelCheckpoint(filepath=RESULT_PATH + 'weights.h5', save_best_only=True, save_weights_only=True)
-        result = model.fit(train_generator, epochs=10, steps_per_epoch=steps_per_epoch,
+        result = model.fit(train_generator, epochs=EPOCHS, steps_per_epoch=steps_per_epoch,
                            validation_data=val_generator, validation_steps=validation_steps, callbacks=[stop, checkpoint])
         self.save_results(result)
         return result
@@ -115,14 +147,15 @@ if __name__ == '__main__':
     test_generator = generate_data(test_data_set[1])
 
     cnn = CNN()
-    model = cnn.build()
+    model = cnn.build_inceptionV3()
     model.summary()
 
     result = cnn.fit(model, train_generator, val_generator)
+    # result = cnn.load_results()
 
-    pneumonia_case = test_data_set[0][test_data_set[0]['class'] == 1]['image'].values[0]
-    layer_names, image_activations = cnn.get_feature_map_results(model, pneumonia_case)
-    show_feature_map_results(layer_names, image_activations)
+    # pneumonia_case = test_data_set[0][test_data_set[0]['class'] == 1]['image'].values[0]
+    # layer_names, image_activations = cnn.get_feature_map_results(model, pneumonia_case)
+    # show_feature_map_results(layer_names, image_activations)
 
     loss, score = model.evaluate(test_generator)
     print("Loss on test set: ", loss * 100)

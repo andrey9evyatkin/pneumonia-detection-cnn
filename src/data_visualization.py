@@ -3,7 +3,7 @@ from mlxtend.plotting import plot_confusion_matrix
 import math
 import matplotlib.pyplot as plt
 
-from constants import RESULT_PATH
+from constants import EPOCHS, RESULT_PATH
 
 
 def show_data(data, amount=5):
@@ -131,12 +131,10 @@ def show_result_graph(metrics):
 
 def draw_graph(metrics, labels, y_label):
     plt.figure(figsize=(6, 4))
-    plt.plot(metrics[0], c='#0c7cba', label=labels[0])
-    plt.plot(metrics[1], c='#c9062a', label=labels[1])
-    plt.xticks(range(0, len(metrics[0]), 10))
-    plt.xlim(0, len(metrics[0]))
+    plt.plot([i for i in range(EPOCHS)], metrics[0], c='#0c7cba', label=labels[0])
+    plt.plot([i for i in range(EPOCHS)], metrics[1], c='#c9062a', label=labels[1])
     plt.ylabel(y_label)
-    plt.xlabel('Epoch')
+    plt.xlabel('Epochs')
     plt.title(labels[0] + ':' + str(metrics[0][-1]) + '\n' + labels[1] + ':' + str(metrics[1][-1]), fontsize=12)
     plt.legend()
     return plt
